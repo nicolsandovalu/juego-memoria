@@ -1,20 +1,17 @@
-/* =============================================
-   TOKENS Y BASE
-   ============================================= */
 :root {
-  --fondo: #0f1117;
-  --superficie: #1a1d27;
-  --borde: #2a2d3d;
-  --acento: #6c63ff;
-  --acento-hover: #8a83ff;
-  --par-ok: #22d3a0;
-  --par-ok-fondo: #0d3329;
-  --texto: #e8e8f0;
-  --texto-tenue: #6b6e8a;
-  --carta-dorso: #252836;
-  --carta-dorso-hover: #2e3247;
-  --radio: 12px;
-  --transicion: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  --fondo: #f4f7f6;         /* Gris muy suave/azulado para el fondo */
+  --superficie: #ffffff;    /* Blanco puro para los paneles */
+  --borde: #e0e8e6;
+  --acento: #ff6b81;        /* Rosa sandía vibrante */
+  --acento-hover: #ff4757;
+  --par-ok: #2ed573;        /* Verde menta alegre */
+  --par-ok-fondo: #e8fcf0;
+  --texto: #2f3542;         /* Gris oscuro para buena lectura */
+  --texto-tenue: #747d8c;
+  --carta-dorso: #70a1ff;   /* Azul cielo para el reverso */
+  --carta-dorso-hover: #5352ed;
+  --radio: 16px;            /* Bordes más redondeados y amigables */
+  --transicion: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Transición con rebote */
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -22,7 +19,8 @@
 body {
   background: var(--fondo);
   color: var(--texto);
-  font-family: 'Segoe UI', system-ui, sans-serif;
+  /* Tipografías amigables y redondeadas nativas */
+  font-family: 'Nunito', 'Segoe UI', system-ui, sans-serif;
   min-height: 100dvh;
   display: flex;
   align-items: flex-start;
@@ -33,99 +31,118 @@ body {
 .contenedor { width: 100%; max-width: 620px; display: flex; flex-direction: column; gap: 24px; }
 
 /* =============================================
-   HEADER Y FOOTER
+   HEADER Y CONTROLES
    ============================================= */
 .cabecera { text-align: center; }
 .cabecera h1 {
-  font-size: clamp(1.8rem, 5vw, 2.6rem); font-weight: 800; letter-spacing: -0.03em;
-  background: linear-gradient(135deg, var(--acento) 0%, var(--par-ok) 100%);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  font-size: clamp(2rem, 6vw, 3rem); font-weight: 800;
+  color: var(--acento);
+  text-shadow: 2px 2px 0px rgba(255, 107, 129, 0.2);
 }
-.subtitulo { color: var(--texto-tenue); font-size: 0.9rem; margin-top: 4px; text-transform: uppercase; }
-.pie-pagina { text-align: center; color: var(--texto-tenue); font-size: 0.8rem; margin-top: 20px; }
+.subtitulo { color: var(--texto-tenue); font-size: 1rem; font-weight: 600; }
 
-/* =============================================
-   CONTROLES
-   ============================================= */
-.controles { display: flex; align-items: flex-end; gap: 10px; flex-wrap: wrap; }
+.controles { display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
 .grupo-control { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 120px; }
-.label-control { font-size: 0.8rem; color: var(--texto-tenue); }
+.label-control { font-size: 0.85rem; font-weight: bold; color: var(--texto-tenue); }
 
 input, select {
-  width: 100%; padding: 10px 14px; background: var(--superficie);
-  border: 1px solid var(--borde); border-radius: var(--radio);
-  color: var(--texto); font-size: 0.95rem; outline: none; transition: border-color var(--transicion);
+  width: 100%; padding: 12px 14px; background: var(--superficie);
+  border: 2px solid var(--borde); border-radius: 10px;
+  color: var(--texto); font-size: 1rem; font-weight: 500; outline: none; 
+  transition: border-color 0.2s;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.02);
 }
 input:focus, select:focus { border-color: var(--acento); }
-select {
-  cursor: pointer; appearance: none; padding-right: 36px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6e8a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat; background-position: right 12px center;
-}
 
 button {
-  padding: 10px 18px; height: 43px; background: var(--acento); color: #fff;
-  border: none; border-radius: var(--radio); font-size: 0.95rem; font-weight: 600;
-  cursor: pointer; display: flex; align-items: center; gap: 8px; white-space: nowrap;
-  transition: background var(--transicion), transform 0.1s;
+  padding: 12px 20px; height: 48px; background: var(--acento); color: #fff;
+  border: none; border-radius: 10px; font-size: 1rem; font-weight: bold;
+  cursor: pointer; display: flex; align-items: center; gap: 8px; 
+  box-shadow: 0 4px 10px rgba(255, 107, 129, 0.3);
+  transition: transform 0.1s, background 0.2s;
 }
-button:hover { background: var(--acento-hover); }
-button:active { transform: scale(0.97); }
-.atajo {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 20px; height: 20px; border-radius: 4px; background: rgba(255,255,255,0.2); font-size: 0.7rem; font-weight: 700;
-}
+button:hover { background: var(--acento-hover); transform: translateY(-2px); }
+button:active { transform: scale(0.95); }
 
 /* =============================================
-   MARCADOR Y TABLERO
+   MARCADOR (Stats)
    ============================================= */
-.marcador { display: flex; gap: 10px; margin-bottom: 8px; }
+.marcador { display: flex; gap: 12px; margin-bottom: 8px; }
 .stat {
-  flex: 1; background: var(--superficie); border: 1px solid var(--borde);
-  border-radius: var(--radio); padding: 14px 12px; text-align: center;
-  display: flex; flex-direction: column; gap: 4px;
+  flex: 1; background: var(--superficie); border: 2px solid var(--borde);
+  border-radius: var(--radio); padding: 12px; text-align: center;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.02);
 }
-.stat-valor { font-size: 1.6rem; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--acento); line-height: 1; }
-.stat-etiqueta { font-size: 0.72rem; color: var(--texto-tenue); text-transform: uppercase; letter-spacing: 0.06em; }
+.stat-valor { font-size: 1.8rem; font-weight: 800; color: var(--carta-dorso); }
+.stat-etiqueta { font-size: 0.75rem; font-weight: bold; color: var(--texto-tenue); text-transform: uppercase; }
 
+/* =============================================
+   TABLERO Y CARTAS
+   ============================================= */
 #tablero {
-  display: grid; gap: 10px;
+  display: grid; gap: 12px;
   grid-template-columns: repeat(var(--columnas, 4), 1fr);
 }
 
-/* =============================================
-   CARTA 3D
-   ============================================= */
-.carta { aspect-ratio: 1; perspective: 600px; cursor: pointer; }
+.carta { aspect-ratio: 1; perspective: 800px; cursor: pointer; }
 .carta-inner {
   width: 100%; height: 100%; position: relative; transform-style: preserve-3d;
   transition: transform var(--transicion); border-radius: var(--radio);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.08);
 }
 .carta.volteada .carta-inner, .carta.encontrada .carta-inner { transform: rotateY(180deg); }
 
 .carta-frente, .carta-dorso {
   position: absolute; inset: 0; border-radius: var(--radio); display: flex;
-  align-items: center; justify-content: center; font-size: clamp(1.4rem, 4vw, 2rem);
+  align-items: center; justify-content: center; font-size: clamp(1.8rem, 5vw, 2.5rem);
   backface-visibility: hidden; -webkit-backface-visibility: hidden;
 }
-.carta-dorso { background: var(--carta-dorso); border: 1px solid var(--borde); color: var(--texto-tenue); font-size: 1.2rem; transition: background var(--transicion); }
-.carta:not(.volteada):not(.encontrada):hover .carta-dorso { background: var(--carta-dorso-hover); border-color: var(--acento); }
-.carta-frente { background: var(--superficie); border: 1px solid var(--borde); transform: rotateY(180deg); }
-.carta.encontrada .carta-frente { background: var(--par-ok-fondo); border-color: var(--par-ok); color: var(--par-ok); }
+
+.carta-dorso { 
+  background: var(--carta-dorso); border: 2px solid rgba(0,0,0,0.05); 
+  color: white; font-size: 1.5rem; transition: background 0.2s; 
+}
+.carta:not(.volteada):not(.encontrada):hover .carta-dorso { background: var(--carta-dorso-hover); }
+
+.carta-frente { background: var(--superficie); border: 2px solid var(--borde); transform: rotateY(180deg); }
+.carta.encontrada .carta-frente { 
+  background: var(--par-ok-fondo); border-color: var(--par-ok); 
+  box-shadow: 0 0 15px rgba(46, 213, 115, 0.4); /* Resplandor verde */
+}
 .carta.encontrada { cursor: default; }
 
 /* =============================================
-   MENSAJES Y RESPONSIVE
+   MODAL DE VICTORIA (CELEBRACIÓN CSS)
    ============================================= */
-.mensaje-victoria {
-  background: linear-gradient(135deg, #1a1d27 0%, #0d3329 100%);
-  border: 1px solid var(--par-ok); border-radius: var(--radio); padding: 28px 24px;
-  text-align: center; animation: aparecer 0.4s ease; margin-top: 10px;
+.overlay-victoria {
+  position: fixed; inset: 0; background: rgba(244, 247, 246, 0.85); backdrop-filter: blur(5px);
+  display: flex; align-items: center; justify-content: center; z-index: 9998;
+  opacity: 0; pointer-events: none; transition: opacity 0.3s;
 }
-.mensaje-victoria.oculto { display: none; }
-.titulo-victoria { font-size: 1.6rem; font-weight: 800; color: var(--par-ok); margin-bottom: 8px; }
-.detalle-victoria { color: var(--texto-tenue); font-size: 0.9rem; }
-.record-zona { text-align: center; font-size: 0.85rem; color: var(--texto-tenue); min-height: 1.2em; }
 
-@keyframes aparecer { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.overlay-victoria.visible { opacity: 1; pointer-events: auto; }
+
+.mensaje-victoria {
+  background: #ffffff; border: 4px solid var(--par-ok); border-radius: 24px; 
+  padding: 40px; text-align: center; max-width: 400px;
+  box-shadow: 0 20px 50px rgba(46, 213, 115, 0.2);
+  transform: scale(0.5); opacity: 0;
+}
+
+/* Animación de celebración TADA */
+.overlay-victoria.visible .mensaje-victoria {
+  animation: reboteCelebracion 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes reboteCelebracion {
+  0% { transform: scale(0.5); opacity: 0; }
+  70% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.titulo-victoria { font-size: 2rem; font-weight: 800; color: var(--acento); margin-bottom: 12px; }
+.detalle-victoria { color: var(--texto); font-size: 1.1rem; line-height: 1.5; font-weight: 600; }
+.record-zona { text-align: center; font-size: 0.95rem; font-weight: bold; color: var(--carta-dorso); margin-top: 16px; }
+
+/* Responsive */
 @media (max-width: 480px) { .controles { flex-direction: column; align-items: stretch; } .grupo-control { min-width: 100%; } }

@@ -1,15 +1,14 @@
 // =============================================================
-// app.js — Juego de Memoria (Versión Auditada y Optimizada)
-// Arquitectura: Single Source of Truth, Delegación de Eventos
+// app.js — Juego de Memoria (Versión Final)
 // =============================================================
 
-const EMOJIS_POOL = ['🍎','🚀','🐱','🌵','🎲','🎧','⚽','🍕','🦊','🌙','🎸','🏄','🦋','🍦','🎯','🌈'];
+const EMOJIS_POOL = ['🐶','🐱','🦊','🐼','🦁','🐸','🦄','🐙','🍕','🍩','🍉','🚀','🌟','🎮','🎨','🌻'];
 
 // 1. ESTADO GLOBAL (Single Source of Truth)
 const state = {
-  cartas: [],        // { emoji, encontrada, volteada }
-  volteadas: [],     // Índices de las cartas volteadas en el turno actual (máx 2)
-  bloqueado: false,  // Control de asincronía
+  cartas: [],
+  volteadas: [],
+  bloqueado: false, // ESTADO DE BLOQUEO CRÍTICO
   movimientos: 0,
   pares: 0,
   totalPares: 0,
@@ -20,7 +19,6 @@ const state = {
   nombreJugador: ''
 };
 
-// 2. UTILIDADES
 function barajar(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -35,13 +33,13 @@ function formatearTiempo(ms) {
   return `${min}:${String(seg % 60).padStart(2, '0')}`;
 }
 
-// 3. MUTACIONES DE ESTADO Y LÓGICA CENTRAL
+// 2. LÓGICA Y MUTACIONES
 function iniciarJuego() {
   const sel = document.getElementById('dificultad');
   const inputNombre = document.getElementById('nombre');
   
   state.dificultad = Number(sel.value);
-  state.nombreJugador = inputNombre.value.trim() || 'Jugador Anónimo';
+  state.nombreJugador = inputNombre.value.trim() || 'Jugador';
 
   const emojis = barajar([...EMOJIS_POOL]).slice(0, state.dificultad);
   const mazo = [];
@@ -57,63 +55,57 @@ function iniciarJuego() {
   state.pares = 0;
   state.totalPares = state.dificultad;
   state.iniciado = false;
-  state.tiempoInicio = null;
-  state.tiempoFin = null;
-
+  
   detenerCronometro();
-  construirTableroDOM(); // Crea los nodos HTML
-  actualizarUI();        // Actualiza clases y textos
+  construirTableroDOM();
+  actualizarUI();
   mostrarRecord();
 }
 
 function voltearCarta(indice) {
   const carta = state.cartas[indice];
 
-  // GUARD CLAUSES (Control de flujo temprano)
+  // GUARD CLAUSES (Previene los bugs reportados por la IA)
   if (state.bloqueado) return;
   if (carta.encontrada) return;
-  if (state.volteadas.includes(indice)) return; // Evita el bug del doble click
+  if (state.volteadas.includes(indice)) return; 
 
-  // Iniciar tiempo en el primer click
   if (!state.iniciado) {
     state.iniciado = true;
     state.tiempoInicio = Date.now();
     iniciarCronometro();
   }
 
-  // Actualizar estado
   carta.volteada = true;
   state.volteadas.push(indice);
-  actualizarUI(); // Reflejar la carta volteada de inmediato
+  actualizarUI(); 
 
-  // Evaluar turno
   if (state.volteadas.length === 2) {
     state.movimientos++;
-    state.bloqueado = true; // Bloqueo de turno
+    state.bloqueado = true; // BLOQUEA EL TABLERO
     actualizarUI();
 
     const [idxA, idxB] = state.volteadas;
 
-    // FIX: Comparación desde la fuente de verdad (estado), no del DOM
     if (state.cartas[idxA].emoji === state.cartas[idxB].emoji) {
-      // PAR ENCONTRADO - Resolución instantánea (sin setTimeout)
+      // COINCIDEN
       state.cartas[idxA].encontrada = true;
       state.cartas[idxB].encontrada = true;
       state.pares++;
       state.volteadas = [];
-      state.bloqueado = false;
+      state.bloqueado = false; // LIBERA EL TABLERO
       actualizarUI();
       
       if (state.pares === state.totalPares) {
         terminarJuego();
       }
     } else {
-      // NO COINCIDEN - Retardo asíncrono
+      // NO COINCIDEN - Retardo
       setTimeout(() => {
         state.cartas[idxA].volteada = false;
         state.cartas[idxB].volteada = false;
         state.volteadas = [];
-        state.bloqueado = false; // Liberar tablero
+        state.bloqueado = false; // LIBERA EL TABLERO
         actualizarUI();
       }, 900);
     }
@@ -128,19 +120,17 @@ function terminarJuego() {
   mostrarRecord();
 }
 
-// 4. CAPA DE RENDERIZADO (DOM)
+// 3. RENDERIZADO DOM
 const elTablero = document.getElementById('tablero');
 const elMovs = document.getElementById('display-movimientos');
 const elTiempo = document.getElementById('display-tiempo');
 const elPares = document.getElementById('display-pares');
+const elOverlay = document.getElementById('overlay-victoria');
 const elMensaje = document.getElementById('mensaje-victoria');
 const elRecord = document.getElementById('display-record');
 
-// FIX Arquitectónico: Separar la creación (DOM) de la actualización (Clases)
-// Esto evita destruir los divs en cada click, permitiendo que la animación CSS 3D funcione.
 function construirTableroDOM() {
-  elTablero.innerHTML = ''; // Se limpia solo al iniciar el juego
-  
+  elTablero.innerHTML = ''; 
   const cols = state.dificultad <= 8 ? 4 : state.dificultad <= 12 ? 4 : 6;
   elTablero.style.setProperty('--columnas', cols);
 
@@ -148,7 +138,6 @@ function construirTableroDOM() {
     const divCarta = document.createElement('div');
     divCarta.className = 'carta';
     divCarta.dataset.indice = i;
-    divCarta.setAttribute('role', 'gridcell');
 
     const inner = document.createElement('div');
     inner.className = 'carta-inner';
@@ -167,10 +156,9 @@ function construirTableroDOM() {
     elTablero.appendChild(divCarta);
   });
   
-  elMensaje.classList.add('oculto');
+  elOverlay.classList.remove('visible');
 }
 
-// Esta función solo muta clases y textos, es rapidísima y respeta animaciones
 function actualizarUI() {
   elMovs.textContent = state.movimientos;
   elPares.textContent = `${state.pares} / ${state.totalPares}`;
@@ -178,41 +166,48 @@ function actualizarUI() {
   const nodosCartas = elTablero.children;
   state.cartas.forEach((carta, i) => {
     const nodo = nodosCartas[i];
-    
-    // Toggle de clases basado estrictamente en el estado
     nodo.classList.toggle('volteada', carta.volteada);
     nodo.classList.toggle('encontrada', carta.encontrada);
-    
-    nodo.setAttribute('aria-label', carta.encontrada || carta.volteada ? carta.emoji : 'Carta boca abajo');
   });
 }
 
-// FIX Seguridad: Prevención XSS
+// FIX Seguridad: Prevención XSS. 
+// Uso exclusivo de createElement y textContent. NO se usa innerHTML.
 function mostrarVictoria() {
   const ms = state.tiempoFin - state.tiempoInicio;
   const tiempo = formatearTiempo(ms);
 
-  elMensaje.classList.remove('oculto');
-  elMensaje.textContent = ''; // Limpieza segura
+  elOverlay.classList.add('visible');
+  elMensaje.textContent = ''; // Limpiar seguro
 
-  const titulo = document.createElement('p');
+  const titulo = document.createElement('h2');
   titulo.className = 'titulo-victoria';
-  titulo.textContent = `¡Excelente, ${state.nombreJugador}! 🎉`; // textContent previene ejecución de scripts
+  titulo.textContent = `¡Felicidades, ${state.nombreJugador}! 🏆`; 
 
   const detalle = document.createElement('p');
   detalle.className = 'detalle-victoria';
-  detalle.textContent = `${state.movimientos} movimientos · ${tiempo} · ${state.totalPares} pares`;
+  detalle.textContent = `Encontraste los ${state.totalPares} pares en ${state.movimientos} movimientos y ${tiempo} segundos.`;
+
+  const btnCerrar = document.createElement('button');
+  btnCerrar.textContent = 'Jugar de nuevo';
+  btnCerrar.style.marginTop = '24px';
+  btnCerrar.style.width = '100%';
+  btnCerrar.style.justifyContent = 'center';
+  btnCerrar.addEventListener('click', () => {
+    elOverlay.classList.remove('visible');
+    iniciarJuego();
+  });
 
   elMensaje.appendChild(titulo);
   elMensaje.appendChild(detalle);
+  elMensaje.appendChild(btnCerrar);
 }
 
-// 5. CRONÓMETRO
+// 4. CRONÓMETRO Y LOCALSTORAGE
 let intervaloCronometro = null;
 function iniciarCronometro() {
   intervaloCronometro = setInterval(() => {
-    const ms = Date.now() - state.tiempoInicio;
-    elTiempo.textContent = formatearTiempo(ms);
+    elTiempo.textContent = formatearTiempo(Date.now() - state.tiempoInicio);
   }, 500);
 }
 
@@ -225,53 +220,33 @@ function detenerCronometro() {
   }
 }
 
-// 6. RECORD CON LOCALSTORAGE (BONUS)
-function claveRecord() {
-  return `memoria_record_${state.dificultad}`;
-}
+function claveRecord() { return `memoria_record_${state.dificultad}`; }
 
 function guardarRecord() {
   const ms = state.tiempoFin - state.tiempoInicio;
   const dataGuardada = JSON.parse(localStorage.getItem(claveRecord()));
-  
   if (!dataGuardada || ms < dataGuardada.ms) {
-    const nuevoRecord = {
-      ms: ms,
-      nombre: state.nombreJugador,
-      movimientos: state.movimientos
-    };
-    localStorage.setItem(claveRecord(), JSON.stringify(nuevoRecord));
+    localStorage.setItem(claveRecord(), JSON.stringify({ ms, nombre: state.nombreJugador }));
   }
 }
 
 function mostrarRecord() {
   const dataGuardada = JSON.parse(localStorage.getItem(claveRecord()));
-  if (!dataGuardada) {
-    elRecord.textContent = '';
-    return;
-  }
-  elRecord.textContent = `🏆 Récord en ${state.dificultad} pares: ${formatearTiempo(dataGuardada.ms)} por ${dataGuardada.nombre}`;
+  if (!dataGuardada) { elRecord.textContent = ''; return; }
+  elRecord.textContent = `🏆 Récord actual (${state.dificultad} pares): ${formatearTiempo(dataGuardada.ms)} por ${dataGuardada.nombre}`;
 }
 
-// 7. MANEJADORES DE EVENTOS
-// Delegación de eventos estricta
+// 5. EVENTOS (DELEGACIÓN)
 elTablero.addEventListener('click', e => {
   const divCarta = e.target.closest('.carta');
   if (!divCarta) return;
-  const indice = Number(divCarta.dataset.indice);
-  voltearCarta(indice);
+  voltearCarta(Number(divCarta.dataset.indice));
 });
 
 document.getElementById('btn-reiniciar').addEventListener('click', iniciarJuego);
-
+document.getElementById('dificultad').addEventListener('change', iniciarJuego);
 document.addEventListener('keydown', e => {
-  if (e.key.toLowerCase() === 'r') {
-    if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'SELECT') return;
-    iniciarJuego();
-  }
+  if (e.key.toLowerCase() === 'r' && document.activeElement.tagName !== 'INPUT') iniciarJuego();
 });
 
-document.getElementById('dificultad').addEventListener('change', iniciarJuego);
-
-// 8. ARRANQUE
 iniciarJuego();
