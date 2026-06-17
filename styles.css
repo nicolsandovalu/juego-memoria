@@ -1,0 +1,131 @@
+/* =============================================
+   TOKENS Y BASE
+   ============================================= */
+:root {
+  --fondo: #0f1117;
+  --superficie: #1a1d27;
+  --borde: #2a2d3d;
+  --acento: #6c63ff;
+  --acento-hover: #8a83ff;
+  --par-ok: #22d3a0;
+  --par-ok-fondo: #0d3329;
+  --texto: #e8e8f0;
+  --texto-tenue: #6b6e8a;
+  --carta-dorso: #252836;
+  --carta-dorso-hover: #2e3247;
+  --radio: 12px;
+  --transicion: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--fondo);
+  color: var(--texto);
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  min-height: 100dvh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 32px 16px 64px;
+}
+
+.contenedor { width: 100%; max-width: 620px; display: flex; flex-direction: column; gap: 24px; }
+
+/* =============================================
+   HEADER Y FOOTER
+   ============================================= */
+.cabecera { text-align: center; }
+.cabecera h1 {
+  font-size: clamp(1.8rem, 5vw, 2.6rem); font-weight: 800; letter-spacing: -0.03em;
+  background: linear-gradient(135deg, var(--acento) 0%, var(--par-ok) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.subtitulo { color: var(--texto-tenue); font-size: 0.9rem; margin-top: 4px; text-transform: uppercase; }
+.pie-pagina { text-align: center; color: var(--texto-tenue); font-size: 0.8rem; margin-top: 20px; }
+
+/* =============================================
+   CONTROLES
+   ============================================= */
+.controles { display: flex; align-items: flex-end; gap: 10px; flex-wrap: wrap; }
+.grupo-control { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 120px; }
+.label-control { font-size: 0.8rem; color: var(--texto-tenue); }
+
+input, select {
+  width: 100%; padding: 10px 14px; background: var(--superficie);
+  border: 1px solid var(--borde); border-radius: var(--radio);
+  color: var(--texto); font-size: 0.95rem; outline: none; transition: border-color var(--transicion);
+}
+input:focus, select:focus { border-color: var(--acento); }
+select {
+  cursor: pointer; appearance: none; padding-right: 36px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6e8a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center;
+}
+
+button {
+  padding: 10px 18px; height: 43px; background: var(--acento); color: #fff;
+  border: none; border-radius: var(--radio); font-size: 0.95rem; font-weight: 600;
+  cursor: pointer; display: flex; align-items: center; gap: 8px; white-space: nowrap;
+  transition: background var(--transicion), transform 0.1s;
+}
+button:hover { background: var(--acento-hover); }
+button:active { transform: scale(0.97); }
+.atajo {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 20px; height: 20px; border-radius: 4px; background: rgba(255,255,255,0.2); font-size: 0.7rem; font-weight: 700;
+}
+
+/* =============================================
+   MARCADOR Y TABLERO
+   ============================================= */
+.marcador { display: flex; gap: 10px; margin-bottom: 8px; }
+.stat {
+  flex: 1; background: var(--superficie); border: 1px solid var(--borde);
+  border-radius: var(--radio); padding: 14px 12px; text-align: center;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.stat-valor { font-size: 1.6rem; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--acento); line-height: 1; }
+.stat-etiqueta { font-size: 0.72rem; color: var(--texto-tenue); text-transform: uppercase; letter-spacing: 0.06em; }
+
+#tablero {
+  display: grid; gap: 10px;
+  grid-template-columns: repeat(var(--columnas, 4), 1fr);
+}
+
+/* =============================================
+   CARTA 3D
+   ============================================= */
+.carta { aspect-ratio: 1; perspective: 600px; cursor: pointer; }
+.carta-inner {
+  width: 100%; height: 100%; position: relative; transform-style: preserve-3d;
+  transition: transform var(--transicion); border-radius: var(--radio);
+}
+.carta.volteada .carta-inner, .carta.encontrada .carta-inner { transform: rotateY(180deg); }
+
+.carta-frente, .carta-dorso {
+  position: absolute; inset: 0; border-radius: var(--radio); display: flex;
+  align-items: center; justify-content: center; font-size: clamp(1.4rem, 4vw, 2rem);
+  backface-visibility: hidden; -webkit-backface-visibility: hidden;
+}
+.carta-dorso { background: var(--carta-dorso); border: 1px solid var(--borde); color: var(--texto-tenue); font-size: 1.2rem; transition: background var(--transicion); }
+.carta:not(.volteada):not(.encontrada):hover .carta-dorso { background: var(--carta-dorso-hover); border-color: var(--acento); }
+.carta-frente { background: var(--superficie); border: 1px solid var(--borde); transform: rotateY(180deg); }
+.carta.encontrada .carta-frente { background: var(--par-ok-fondo); border-color: var(--par-ok); color: var(--par-ok); }
+.carta.encontrada { cursor: default; }
+
+/* =============================================
+   MENSAJES Y RESPONSIVE
+   ============================================= */
+.mensaje-victoria {
+  background: linear-gradient(135deg, #1a1d27 0%, #0d3329 100%);
+  border: 1px solid var(--par-ok); border-radius: var(--radio); padding: 28px 24px;
+  text-align: center; animation: aparecer 0.4s ease; margin-top: 10px;
+}
+.mensaje-victoria.oculto { display: none; }
+.titulo-victoria { font-size: 1.6rem; font-weight: 800; color: var(--par-ok); margin-bottom: 8px; }
+.detalle-victoria { color: var(--texto-tenue); font-size: 0.9rem; }
+.record-zona { text-align: center; font-size: 0.85rem; color: var(--texto-tenue); min-height: 1.2em; }
+
+@keyframes aparecer { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 480px) { .controles { flex-direction: column; align-items: stretch; } .grupo-control { min-width: 100%; } }

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Memoria - Evaluación Front End</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="contenedor">
+    <header class="cabecera">
+      <h1>Memoria</h1>
+      <p class="subtitulo">Encuentra todos los pares</p>
+    </header>
+
+    <main class="contenedor-principal">
+      <section class="controles" aria-label="Controles del juego">
+        <div class="grupo-control">
+          <label for="nombre" class="label-control">Jugador</label>
+          <input type="text" id="nombre" placeholder="Tu nombre..." autocomplete="off">
+        </div>
+
+        <div class="grupo-control">
+          <label for="dificultad" class="label-control">Dificultad</label>
+          <select id="dificultad">
+            <option value="4">Muy Fácil — 4 pares</option>
+            <option value="8">Fácil — 8 pares</option>
+            <option value="12" selected>Normal — 12 pares</option>
+            <option value="16">Difícil — 16 pares</option>
+          </select>
+        </div>
+        
+        <button id="btn-reiniciar">Reiniciar <span class="atajo">R</span></button>
+      </section>
+
+      <section class="marcador" aria-label="Estadísticas">
+        <div class="stat">
+          <span class="stat-valor" id="display-movimientos">0</span>
+          <span class="stat-etiqueta">Movimientos</span>
+        </div>
+        <div class="stat">
+          <span class="stat-valor" id="display-tiempo">0:00</span>
+          <span class="stat-etiqueta">Tiempo</span>
+        </div>
+        <div class="stat">
+          <span class="stat-valor" id="display-pares">0</span>
+          <span class="stat-etiqueta">Pares</span>
+        </div>
+      </section>
+
+      <section id="tablero" role="grid" aria-label="Tablero de memoria"></section>
+
+      <div id="mensaje-victoria" class="mensaje-victoria oculto" role="alert" aria-live="polite"></div>
+
+      <section class="record-zona">
+        <span id="display-record"></span>
+      </section>
+    </main>
+
+    <footer class="pie-pagina">
+      <p>Proyecto de Programación Front End · DOM y Eventos</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
