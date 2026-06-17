@@ -249,4 +249,10 @@ document.addEventListener('keydown', e => {
   if (e.key.toLowerCase() === 'r' && document.activeElement.tagName !== 'INPUT') iniciarJuego();
 });
 
+// FIX: Actualización en tiempo real del nombre del jugador.
+// Evita el bug donde el usuario escribe su nombre a mitad de la partida.
+document.getElementById('nombre').addEventListener('input', (e) => {
+  state.nombreJugador = e.target.value.trim() || 'Jugador';
+});
+
 iniciarJuego();
