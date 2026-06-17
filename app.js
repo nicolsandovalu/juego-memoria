@@ -1,5 +1,5 @@
 // =============================================================
-// app.js — Juego de Memoria (Versión Final)
+// app.js — Juego de Memoria (Versión Final Corregida)
 // =============================================================
 
 const EMOJIS_POOL = ['🐶','🐱','🦊','🐼','🦁','🐸','🦄','🐙','🍕','🍩','🍉','🚀','🌟','🎮','🎨','🌻'];
@@ -18,6 +18,10 @@ const state = {
   dificultad: 12,
   nombreJugador: ''
 };
+
+// VARIABLES DE CONTROL ASÍNCRONO
+let intervaloCronometro = null;
+let timeoutTurno = null; // FIX: Controla el retardo al voltear cartas
 
 function barajar(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
@@ -48,6 +52,10 @@ function iniciarJuego() {
     mazo.push({ emoji: e, encontrada: false, volteada: false });
   });
 
+  // FIX: Destruir procesos asíncronos pendientes ("Race Conditions")
+  if (timeoutTurno) clearTimeout(timeoutTurno);
+  detenerCronometro();
+
   state.cartas = barajar(mazo);
   state.volteadas = [];
   state.bloqueado = false;
@@ -55,8 +63,13 @@ function iniciarJuego() {
   state.pares = 0;
   state.totalPares = state.dificultad;
   state.iniciado = false;
+  state.tiempoInicio = null;
+  state.tiempoFin = null;
   
-  detenerCronometro();
+  // FIX: Forzar visualmente el reseteo a 0:00 en el DOM
+  const elTiempo = document.getElementById('display-tiempo');
+  if (elTiempo) elTiempo.textContent = '0:00';
+
   construirTableroDOM();
   actualizarUI();
   mostrarRecord();
@@ -101,7 +114,8 @@ function voltearCarta(indice) {
       }
     } else {
       // NO COINCIDEN - Retardo
-      setTimeout(() => {
+      // FIX: Asignar a timeoutTurno para poder cancelarlo si el usuario reinicia
+      timeoutTurno = setTimeout(() => {
         state.cartas[idxA].volteada = false;
         state.cartas[idxB].volteada = false;
         state.volteadas = [];
@@ -109,7 +123,7 @@ function voltearCarta(indice) {
         actualizarUI();
       }, 900);
     }
-  }
+  } // <-- AQUI FALTABA ESTA LLAVE DE CIERRE PARA voltearCarta()
 }
 
 function terminarJuego() {
@@ -204,19 +218,22 @@ function mostrarVictoria() {
 }
 
 // 4. CRONÓMETRO Y LOCALSTORAGE
-let intervaloCronometro = null;
 function iniciarCronometro() {
+  // Limpiar por precaución antes de iniciar uno nuevo
+  if (intervaloCronometro) clearInterval(intervaloCronometro);
+  
   intervaloCronometro = setInterval(() => {
-    elTiempo.textContent = formatearTiempo(Date.now() - state.tiempoInicio);
+    const elTiempoAct = document.getElementById('display-tiempo');
+    if (elTiempoAct && state.tiempoInicio) {
+      elTiempoAct.textContent = formatearTiempo(Date.now() - state.tiempoInicio);
+    }
   }, 500);
 }
 
 function detenerCronometro() {
-  clearInterval(intervaloCronometro);
-  if (state.tiempoInicio && state.tiempoFin) {
-    elTiempo.textContent = formatearTiempo(state.tiempoFin - state.tiempoInicio);
-  } else {
-    elTiempo.textContent = '0:00';
+  if (intervaloCronometro) {
+    clearInterval(intervaloCronometro);
+    intervaloCronometro = null;
   }
 }
 
@@ -255,4 +272,4 @@ document.getElementById('nombre').addEventListener('input', (e) => {
   state.nombreJugador = e.target.value.trim() || 'Jugador';
 });
 
-iniciarJuego();
+iniciarJuego(); 
