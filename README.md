@@ -25,7 +25,7 @@ Para cumplir con las buenas prácticas y asegurar el rendimiento de la aplicaci�
 * **Delegación de Eventos**: En lugar de ponerle un addEventListener a cada una de las cartas generadas (lo que saturaría la memoria si se juega en dificultad alta con 32 cartas), le asigné un único listener al contenedor padre (#tablero). Usando e.target.closest('.carta') capturo el clic exacto. Esto mejora muchísimo el rendimiento del navegador y evita fugas de memoria al cambiar de dificultad.
 
 * **Diseño fluido y accesibilidad (`rem` vs `px`):** En lugar de estructurar la interfaz con medidas absolutas (`px`) que vuelven el diseño rígido, decidí implementar una arquitectura CSS basada en unidades relativas (`rem` para tipografías/espaciados y `%` para contenedores). Esta decisión no solo garantiza que el juego sea verdaderamente responsivo, sino que respeta la configuración nativa de accesibilidad del navegador si el usuario requiere una fuente más grande.
-* 
+
 ## 3. Oportunidades de Mejora
 Si el alcance y el tiempo del proyecto lo permitieran, escalaría la aplicación en las siguientes áreas:
 
