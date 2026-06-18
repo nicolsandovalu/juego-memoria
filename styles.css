@@ -73,7 +73,12 @@ button:active { transform: scale(0.95); }
   border-radius: var(--radio); padding: 12px; text-align: center;
   box-shadow: 0 4px 6px rgba(0,0,0,0.02);
 }
-.stat-valor { font-size: 1.8rem; font-weight: 800; color: var(--carta-dorso); }
+.stat-valor { 
+  font-size: 1.8rem; 
+  font-weight: 800; 
+  color: var(--carta-dorso); 
+  white-space: nowrap; /* FIX: Obliga a que el texto se mantenga en una sola línea */
+}
 .stat-etiqueta { font-size: 0.75rem; font-weight: bold; color: var(--texto-tenue); text-transform: uppercase; }
 
 /* =============================================
