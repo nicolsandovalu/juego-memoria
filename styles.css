@@ -1,143 +1,220 @@
+/* =============================================
+   TOKENS - TEMA ALEGRE Y LUMINOSO ☀️
+   (Medidas relativas: 1rem = 16px por defecto)
+   ============================================= */
 :root {
-  --fondo: #f4f7f6;         /* Gris muy suave/azulado para el fondo */
-  --superficie: #ffffff;    /* Blanco puro para los paneles */
+  --fondo: #f4f7f6;
+  --superficie: #ffffff;
   --borde: #e0e8e6;
-  --acento: #ff6b81;        /* Rosa sandía vibrante */
+  --acento: #ff6b81;
   --acento-hover: #ff4757;
-  --par-ok: #2ed573;        /* Verde menta alegre */
+  --par-ok: #2ed573;
   --par-ok-fondo: #e8fcf0;
-  --texto: #2f3542;         /* Gris oscuro para buena lectura */
+  --texto: #2f3542;
   --texto-tenue: #747d8c;
-  --carta-dorso: #70a1ff;   /* Azul cielo para el reverso */
+  --carta-dorso: #70a1ff;
   --carta-dorso-hover: #5352ed;
-  --radio: 16px;            /* Bordes más redondeados y amigables */
-  --transicion: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Transición con rebote */
+  
+  /* Radios convertidos a rem (16px = 1rem, 10px = 0.625rem, 8px = 0.5rem) */
+  --radio: 1rem;          
+  --radio-sm: 0.625rem;
+  --radio-xs: 0.5rem;
+  
+  --transicion: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { 
+  box-sizing: border-box; 
+  margin: 0; 
+  padding: 0; 
+}
 
 body {
   background: var(--fondo);
   color: var(--texto);
-  /* Tipografías amigables y redondeadas nativas */
   font-family: 'Nunito', 'Segoe UI', system-ui, sans-serif;
-  min-height: 100dvh;
+  min-height: 100vh; /* Uso de Viewport Height */
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding: 32px 16px 64px;
+  /* padding: 32px 16px 64px -> rem */
+  padding: 2rem 1rem 4rem; 
 }
 
-.contenedor { width: 100%; max-width: 620px; display: flex; flex-direction: column; gap: 24px; }
+.contenedor { 
+  width: 100%; 
+  max-width: 38.75rem; /* 620px */ 
+  display: flex; 
+  flex-direction: column; 
+  gap: 1.5rem; /* 24px */
+}
 
 /* =============================================
    HEADER Y CONTROLES
    ============================================= */
 .cabecera { text-align: center; }
 .cabecera h1 {
-  font-size: clamp(2rem, 6vw, 3rem); font-weight: 800;
+  /* clamp ya usa rem y vw, excelente práctica */
+  font-size: clamp(2rem, 6vw, 3rem); 
+  font-weight: 800;
   color: var(--acento);
-  text-shadow: 2px 2px 0px rgba(255, 107, 129, 0.2);
+  text-shadow: 0.125rem 0.125rem 0 rgba(255, 107, 129, 0.2);
 }
-.subtitulo { color: var(--texto-tenue); font-size: 1rem; font-weight: 600; }
+.subtitulo { 
+  color: var(--texto-tenue); 
+  font-size: 1rem; 
+  font-weight: 600; 
+}
 
-.controles { display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
-.grupo-control { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 120px; }
-.label-control { font-size: 0.85rem; font-weight: bold; color: var(--texto-tenue); }
+.controles { 
+  display: flex; 
+  align-items: flex-end; 
+  gap: 0.75rem; 
+  flex-wrap: wrap; 
+}
+.grupo-control { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 0.375rem; 
+  flex: 1; 
+  min-width: 7.5rem; /* 120px */
+}
+.label-control { 
+  font-size: 0.85rem; 
+  font-weight: bold; 
+  color: var(--texto-tenue); 
+}
 
+/* Nota: Los bordes de 2px se mantienen en px para evitar el difuminado (subpixel rendering) en pantallas de baja resolución. Es la única excepción permitida y recomendada en RWD. */
 input, select {
-  width: 100%; padding: 12px 14px; background: var(--superficie);
-  border: 2px solid var(--borde); border-radius: 10px;
-  color: var(--texto); font-size: 1rem; font-weight: 500; outline: none; 
+  width: 100%; 
+  padding: 0.75rem 0.875rem; 
+  background: var(--superficie);
+  border: 2px solid var(--borde); 
+  border-radius: var(--radio-sm);
+  color: var(--texto); 
+  font-size: 1rem; 
+  font-weight: 500; 
+  outline: none; 
   transition: border-color 0.2s;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+  box-shadow: 0 0.125rem 0.3125rem rgba(0,0,0,0.02);
 }
 input:focus, select:focus { border-color: var(--acento); }
 
 button {
-  padding: 12px 20px; height: 48px; background: var(--acento); color: #fff;
-  border: none; border-radius: 10px; font-size: 1rem; font-weight: bold;
-  cursor: pointer; display: flex; align-items: center; gap: 8px; 
-  box-shadow: 0 4px 10px rgba(255, 107, 129, 0.3);
+  padding: 0.75rem 1.25rem; 
+  height: 3rem; 
+  background: var(--acento); 
+  color: #fff;
+  border: none; 
+  border-radius: var(--radio-sm); 
+  font-size: 1rem; 
+  font-weight: bold;
+  cursor: pointer; 
+  display: flex; 
+  align-items: center; 
+  gap: 0.5rem; 
+  box-shadow: 0 0.25rem 0.625rem rgba(255, 107, 129, 0.3);
   transition: transform 0.1s, background 0.2s;
 }
-button:hover { background: var(--acento-hover); transform: translateY(-2px); }
+button:hover { 
+  background: var(--acento-hover); 
+  transform: translateY(-0.125rem); 
+}
 button:active { transform: scale(0.95); }
 
 /* =============================================
    MARCADOR (Stats)
    ============================================= */
-.marcador { display: flex; gap: 12px; margin-bottom: 8px; }
+.marcador { 
+  display: flex; 
+  gap: 0.75rem; 
+  margin-bottom: 0.5rem; 
+}
 .stat {
-  flex: 1; background: var(--superficie); border: 2px solid var(--borde);
-  border-radius: var(--radio); padding: 12px; text-align: center;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+  flex: 1; 
+  background: var(--superficie); 
+  border: 2px solid var(--borde);
+  border-radius: var(--radio); 
+  padding: 0.75rem; 
+  text-align: center;
+  box-shadow: 0 0.25rem 0.375rem rgba(0,0,0,0.02);
 }
 .stat-valor { 
   font-size: 1.8rem; 
   font-weight: 800; 
   color: var(--carta-dorso); 
-  white-space: nowrap; /* FIX: Obliga a que el texto se mantenga en una sola línea */
+  white-space: nowrap; 
 }
-.stat-etiqueta { font-size: 0.75rem; font-weight: bold; color: var(--texto-tenue); text-transform: uppercase; }
+.stat-etiqueta { 
+  font-size: 0.75rem; 
+  font-weight: bold; 
+  color: var(--texto-tenue); 
+  text-transform: uppercase; 
+}
 
 /* =============================================
    TABLERO Y CARTAS
    ============================================= */
 #tablero {
-  display: grid; gap: 12px;
+  display: grid; 
+  gap: 0.75rem;
   grid-template-columns: repeat(var(--columnas, 4), 1fr);
 }
 
-.carta { aspect-ratio: 1; perspective: 800px; cursor: pointer; }
-.carta-inner {
-  width: 100%; height: 100%; position: relative; transform-style: preserve-3d;
-  transition: transform var(--transicion); border-radius: var(--radio);
-  box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+.carta { 
+  aspect-ratio: 1; 
+  perspective: 50rem; 
+  cursor: pointer; 
 }
-.carta.volteada .carta-inner, .carta.encontrada .carta-inner { transform: rotateY(180deg); }
+.carta-inner {
+  width: 100%; 
+  height: 100%; 
+  position: relative; 
+  transform-style: preserve-3d;
+  transition: transform var(--transicion); 
+  border-radius: var(--radio);
+  box-shadow: 0 0.375rem 0.75rem rgba(0,0,0,0.08);
+}
+.carta.volteada .carta-inner, .carta.encontrada .carta-inner { 
+  transform: rotateY(180deg); 
+}
 
 .carta-frente, .carta-dorso {
-  position: absolute; inset: 0; border-radius: var(--radio); display: flex;
-  align-items: center; justify-content: center; font-size: clamp(1.8rem, 5vw, 2.5rem);
-  backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  position: absolute; 
+  inset: 0; 
+  border-radius: var(--radio); 
+  display: flex;
+  align-items: center; 
+  justify-content: center; 
+  font-size: clamp(1.8rem, 5vw, 2.5rem);
+  backface-visibility: hidden; 
+  -webkit-backface-visibility: hidden;
 }
 
 .carta-dorso { 
-  background: var(--carta-dorso); border: 2px solid rgba(0,0,0,0.05); 
-  color: white; font-size: 1.5rem; transition: background 0.2s; 
+  background: var(--carta-dorso); 
+  border: 2px solid rgba(0,0,0,0.05); 
+  color: white; 
+  font-size: 1.5rem; 
+  transition: background 0.2s; 
 }
-.carta:not(.volteada):not(.encontrada):hover .carta-dorso { background: var(--carta-dorso-hover); }
+.carta:not(.volteada):not(.encontrada):hover .carta-dorso { 
+  background: var(--carta-dorso-hover); 
+}
 
-.carta-frente { background: var(--superficie); border: 2px solid var(--borde); transform: rotateY(180deg); }
+.carta-frente { 
+  background: var(--superficie); 
+  border: 2px solid var(--borde); 
+  transform: rotateY(180deg); 
+}
 .carta.encontrada .carta-frente { 
-  background: var(--par-ok-fondo); border-color: var(--par-ok); 
-  box-shadow: 0 0 15px rgba(46, 213, 115, 0.4); /* Resplandor verde */
+  background: var(--par-ok-fondo); 
+  border-color: var(--par-ok); 
+  box-shadow: 0 0 1rem rgba(46, 213, 115, 0.4); 
 }
 .carta.encontrada { cursor: default; }
 
-/* =============================================
-   MODAL DE VICTORIA (CELEBRACIÓN CSS)
-   ============================================= */
-.overlay-victoria {
-  position: fixed; inset: 0; background: rgba(244, 247, 246, 0.85); backdrop-filter: blur(5px);
-  display: flex; align-items: center; justify-content: center; z-index: 9998;
-  opacity: 0; pointer-events: none; transition: opacity 0.3s;
-}
-
-.overlay-victoria.visible { opacity: 1; pointer-events: auto; }
-
-.mensaje-victoria {
-  background: #ffffff; border: 4px solid var(--par-ok); border-radius: 24px; 
-  padding: 40px; text-align: center; max-width: 400px;
-  box-shadow: 0 20px 50px rgba(46, 213, 115, 0.2);
-  transform: scale(0.5); opacity: 0;
-}
-
-/* Animación de celebración TADA */
-.overlay-victoria.visible .mensaje-victoria {
-  animation: reboteCelebracion 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-}
 /* =============================================
    HISTORIAL DE SESIÓN
    ============================================= */
@@ -145,15 +222,15 @@ button:active { transform: scale(0.95); }
   background: var(--superficie);
   border: 2px solid var(--borde);
   border-radius: var(--radio);
-  padding: 16px;
-  margin-bottom: 16px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 0.25rem 0.375rem rgba(0,0,0,0.02);
 }
 
 .historial-zona h3 {
   font-size: 1rem;
   color: var(--acento);
-  margin-bottom: 12px;
+  margin-bottom: 0.75rem;
   text-align: center;
 }
 
@@ -161,28 +238,66 @@ button:active { transform: scale(0.95); }
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  max-height: 140px; /* Permite scroll si hay muchas partidas */
+  gap: 0.5rem;
+  max-height: 8.75rem; /* ~140px, permite scroll */
   overflow-y: auto;
-  padding-right: 4px;
+  padding-right: 0.25rem;
 }
 
 #lista-historial li {
   font-size: 0.85rem;
   font-weight: 600;
-  padding: 10px 12px;
+  padding: 0.625rem 0.75rem;
   background: var(--fondo);
-  border-radius: 8px;
+  border-radius: var(--radio-xs);
   color: var(--texto);
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-/* Scrollbar personalizado para el historial */
-#lista-historial::-webkit-scrollbar { width: 6px; }
-#lista-historial::-webkit-scrollbar-track { background: var(--fondo); border-radius: 8px; }
-#lista-historial::-webkit-scrollbar-thumb { background: var(--borde); border-radius: 8px; }
+#lista-historial::-webkit-scrollbar { width: 0.375rem; }
+#lista-historial::-webkit-scrollbar-track { background: var(--fondo); border-radius: var(--radio-xs); }
+#lista-historial::-webkit-scrollbar-thumb { background: var(--borde); border-radius: var(--radio-xs); }
+
+/* =============================================
+   MODAL DE VICTORIA
+   ============================================= */
+.overlay-victoria {
+  position: fixed; 
+  inset: 0; 
+  background: rgba(244, 247, 246, 0.85); 
+  backdrop-filter: blur(0.3125rem);
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  z-index: 9998;
+  opacity: 0; 
+  pointer-events: none; 
+  transition: opacity 0.3s;
+}
+
+.overlay-victoria.visible { 
+  opacity: 1; 
+  pointer-events: auto; 
+}
+
+.mensaje-victoria {
+  background: var(--superficie); 
+  border: 4px solid var(--par-ok); 
+  border-radius: 1.5rem; 
+  padding: 2.5rem; 
+  text-align: center; 
+  width: 90%;
+  max-width: 25rem; /* 400px */
+  box-shadow: 0 1.25rem 3.125rem rgba(46, 213, 115, 0.2);
+  transform: scale(0.5); 
+  opacity: 0;
+}
+
+.overlay-victoria.visible .mensaje-victoria {
+  animation: reboteCelebracion 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
 
 @keyframes reboteCelebracion {
   0% { transform: scale(0.5); opacity: 0; }
@@ -190,9 +305,35 @@ button:active { transform: scale(0.95); }
   100% { transform: scale(1); opacity: 1; }
 }
 
-.titulo-victoria { font-size: 2rem; font-weight: 800; color: var(--acento); margin-bottom: 12px; }
-.detalle-victoria { color: var(--texto); font-size: 1.1rem; line-height: 1.5; font-weight: 600; }
-.record-zona { text-align: center; font-size: 0.95rem; font-weight: bold; color: var(--carta-dorso); margin-top: 16px; }
+.titulo-victoria { 
+  font-size: 2rem; 
+  font-weight: 800; 
+  color: var(--acento); 
+  margin-bottom: 0.75rem; 
+}
+.detalle-victoria { 
+  color: var(--texto); 
+  font-size: 1.1rem; 
+  line-height: 1.5; 
+  font-weight: 600; 
+}
+.record-zona { 
+  text-align: center; 
+  font-size: 0.95rem; 
+  font-weight: bold; 
+  color: var(--carta-dorso); 
+  margin-top: 1rem; 
+}
 
-/* Responsive */
-@media (max-width: 480px) { .controles { flex-direction: column; align-items: stretch; } .grupo-control { min-width: 100%; } }
+/* =============================================
+   RESPONSIVE (Mobile First Adapter)
+   ============================================= */
+@media (max-width: 30em) /* 480px = 30em */ { 
+  .controles { 
+    flex-direction: column; 
+    align-items: stretch; 
+  } 
+  .grupo-control { 
+    min-width: 100%; 
+  } 
+}
