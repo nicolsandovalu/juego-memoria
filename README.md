@@ -7,7 +7,7 @@ Este repositorio contiene la entrega del proyecto de Programación Front End. Es
 ## 1. ¿Dónde me ayudó la IA y dónde tuve que corregir código?
 Usé la Inteligencia Artificial para generar rápido la estructura base del HTML y los estilos visuales iniciales. Sin embargo, me entregó código con varias fallas lógicas y malas prácticas que tuve que auditar y corregir manualmente o a través de prompts:
 
-* **Sin semántica HTML**: El marcado original carecía de estructura real. La IA abusó de etiquetas <div> genéricas para todo, por lo que tuve que refactorizar el código utilizando elementos semánticos de HTML5 (<main>, <section>, <header>) para cumplir con los estándares web.
+* **Sin semántica HTML**: El marcado original carecía de estructura real. La IA abusó de etiquetas ```<div>``` genéricas para todo, por lo que tuve que refactorizar el código utilizando elementos semánticos de HTML5 (<main>,<section>, <header>) para cumplir con los estándares web.
 
 * **Vulnerabilidad XSS**: Al pedirle que agregara un input para el nombre del jugador, la IA inyectó el valor en el DOM usando innerHTML. Tuve que cambiar esto inmediatamente porque dejaba la aplicación vulnerable a ataques de Cross-Site Scripting. Además, realizando una última auditoría al código ya listo, en la línea 154 se encontraba otro InnerHTML, si bien, no representaba un riesgo, es importante mantener las buenas prácticas de programación. 
 
