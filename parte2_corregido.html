@@ -5,31 +5,103 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Juego de Memoria — versión auditada</title>
 <style>
-  body{font-family:system-ui,sans-serif;max-width:540px;margin:40px auto;padding:0 16px;color:#222}
-  h1{font-size:1.4rem}
-  .fila{display:flex;gap:8px;margin-bottom:16px}
-  input{flex:1;padding:8px 10px;font-size:1rem;border:1px solid #bbb;border-radius:6px}
-  button{padding:8px 12px;font-size:1rem;cursor:pointer;border:1px solid #888;border-radius:6px;background:#f3f3f3}
-  #tablero{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:8px}
-  .carta{aspect-ratio:1;display:flex;align-items:center;justify-content:center;
-    font-size:1.8rem;background:#2b3a42;color:#fff;border-radius:10px;cursor:pointer;user-select:none}
-  .carta.volteada{background:#e8eef0;color:#222}
-  .carta.encontrada{background:#cdebd7;color:#222;cursor:default}
-  #movimientos{color:#666;font-size:.9rem;margin-top:14px}
-  #mensaje{font-size:1.1rem;font-weight:600;margin-top:8px}
+
+    /* FIX Arquitectura/Accesibilidad: Refactorización a CSS fluido y relativo.
+    BUG Arquitectura: El código original abusaba de unidades absolutas (px) 
+    (ej. max-width: 540px, padding: 16px), lo que hace que la interfaz sea rígida 
+    y no respete las preferencias de accesibilidad de escalado del navegador. 
+    Se convirtieron las medidas a 'rem' y se formateó el código para su mantenibilidad.
+  */
+
+  body {
+    font-family: system-ui, sans-serif;
+    max-width: 33.75rem; /* 540px */
+    margin: 2.5rem auto; /* 40px */
+    padding: 0 1rem;     /* 16px */
+    color: #222;
+  }
+  h1 { font-size: 1.4rem; }
+  
+  .fila {
+    display: flex;
+    gap: 0.5rem;         /* 8px */
+    margin-bottom: 1rem; /* 16px */
+  }
+  
+  input {
+    flex: 1;
+    padding: 0.5rem 0.625rem; /* 8px 10px */
+    font-size: 1rem;
+    border: 1px solid #bbb;
+    border-radius: 0.375rem;  /* 6px */
+  }
+  
+  button {
+    padding: 0.5rem 0.75rem;  /* 8px 12px */
+    font-size: 1rem;
+    cursor: pointer;
+    border: 1px solid #888;
+    border-radius: 0.375rem;  /* 6px */
+    background: #f3f3f3;
+  }
+  
+  #tablero {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.625rem;            /* 10px */
+    margin-top: 0.5rem;       /* 8px */
+  }
+  
+  .carta {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    background: #2b3a42;
+    color: #fff;
+    border-radius: 0.625rem;  /* 10px */
+    cursor: pointer;
+    user-select: none;
+  }
+  
+  .carta.volteada {
+    background: #e8eef0;
+    color: #222;
+  }
+  
+  .carta.encontrada {
+    background: #cdebd7;
+    color: #222;
+    cursor: default;
+  }
+  
+  #movimientos {
+    color: #666;
+    font-size: 0.9rem;
+    margin-top: 0.875rem;     /* 14px */
+  }
+  
+  #mensaje {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-top: 0.5rem;       /* 8px */
+  }
 </style>
 </head>
 <body>
 <h1>Juego de Memoria</h1>
 
-<header class="fila" aria-label="Controles del juego">
-  <input id="nombre" placeholder="Tu nombre...">
-  <button id="iniciar">Iniciar / Reiniciar</button>
-</header> <!--Arquitectura — Sin semántica HTML (Divitis):
+<!--Arquitectura — Sin semántica HTML (Divitis):
        El código original estructuraba toda la vista con etiquetas <div>.
        Esto rompe los estándares de accesibilidad (a11y). Se reemplazaron 
        por etiquetas semánticas como <header> para los controles y <main> 
        para el tablero de juego.-->
+       
+<header class="fila" aria-label="Controles del juego">
+  <input id="nombre" placeholder="Tu nombre...">
+  <button id="iniciar">Iniciar / Reiniciar</button>
+</header> 
 
 <main id="tablero" aria-label="Tablero de cartas"></main>
 
