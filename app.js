@@ -153,8 +153,15 @@ const elRecord = document.getElementById('display-record');
 
 function construirTableroDOM() {
   elTablero.innerHTML = ''; 
-  const cols = state.dificultad <= 8 ? 4 : state.dificultad <= 12 ? 4 : 6;
-  elTablero.style.setProperty('--columnas', cols);
+
+  // FIX UX: Cálculo dinámico para evitar el scroll vertical.
+  // Mantenemos la cuadrícula en un máximo de 4 filas siempre.
+  let cols = 4;
+  if (state.dificultad === 8) cols = 8; // Fácil (16 cartas): 8 columnas x 2 filas
+  if (state.dificultad === 12) cols = 6; // 24 cartas = 6 columnas x 4 filas
+  if (state.dificultad === 16) cols = 8; // 32 cartas = 8 columnas x 4 filas
+  
+elTablero.style.setProperty('--columnas', cols);
 
   state.cartas.forEach((carta, i) => {
     const divCarta = document.createElement('div');

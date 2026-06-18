@@ -33,20 +33,22 @@ body {
   background: var(--fondo);
   color: var(--texto);
   font-family: 'Nunito', 'Segoe UI', system-ui, sans-serif;
-  min-height: 100vh; /* Uso de Viewport Height */
+  min-height: 100vh;
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  /* padding: 32px 16px 64px -> rem */
-  padding: 2rem 1rem 4rem; 
+  /* FIX: Reducimos el padding superior e inferior para ganar espacio en pantalla */
+  padding: 1rem; 
 }
 
 .contenedor { 
   width: 100%; 
-  max-width: 38.75rem; /* 620px */ 
+  /* FIX: Aumentamos el max-width de 38.75rem a 45rem para que las 6 u 8 columnas quepan perfecto */
+  max-width: 45rem; 
   display: flex; 
   flex-direction: column; 
-  gap: 1.5rem; /* 24px */
+  /* FIX: Reducimos el gap general de 1.5rem a 1rem para compactar los paneles */
+  gap: 1rem; 
 }
 
 /* =============================================
