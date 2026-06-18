@@ -16,7 +16,10 @@ const state = {
   tiempoInicio: null,
   tiempoFin: null,
   dificultad: 12,
-  nombreJugador: ''
+  nombreJugador: '',
+  partidasJugadas: 0,
+  tiempoTotalAcumulado: 0,
+  historialPartidas: []
 };
 
 // VARIABLES DE CONTROL ASÍNCRONO
@@ -38,12 +41,19 @@ function formatearTiempo(ms) {
 }
 
 // 2. LÓGICA Y MUTACIONES
-function iniciarJuego() {
+function iniciarJuego(reinicioFuerte = false) {
   const sel = document.getElementById('dificultad');
   const inputNombre = document.getElementById('nombre');
   
   state.dificultad = Number(sel.value);
   state.nombreJugador = inputNombre.value.trim() || 'Jugador';
+
+  // FIX: Si el usuario presiona "Reiniciar", borramos el historial
+  if (reinicioFuerte) {
+    state.partidasJugadas = 0;
+    state.tiempoTotalAcumulado = 0;
+    state.historialPartidas = [];
+  }
 
   const emojis = barajar([...EMOJIS_POOL]).slice(0, state.dificultad);
   const mazo = [];
@@ -52,7 +62,6 @@ function iniciarJuego() {
     mazo.push({ emoji: e, encontrada: false, volteada: false });
   });
 
-  // FIX: Destruir procesos asíncronos pendientes ("Race Conditions")
   if (timeoutTurno) clearTimeout(timeoutTurno);
   detenerCronometro();
 
@@ -66,15 +75,14 @@ function iniciarJuego() {
   state.tiempoInicio = null;
   state.tiempoFin = null;
   
-  // FIX: Forzar visualmente el reseteo a 0:00 en el DOM
   const elTiempo = document.getElementById('display-tiempo');
   if (elTiempo) elTiempo.textContent = '0:00';
 
   construirTableroDOM();
   actualizarUI();
   mostrarRecord();
+  renderizarHistorial();
 }
-
 function voltearCarta(indice) {
   const carta = state.cartas[indice];
 
@@ -184,12 +192,53 @@ function actualizarUI() {
     nodo.classList.toggle('encontrada', carta.encontrada);
   });
 }
+function renderizarHistorial() {
+  const contenedor = document.getElementById('lista-historial');
+  if (!contenedor) return;
+
+  contenedor.textContent = ''; // Limpieza segura del DOM
+
+  if (state.historialPartidas.length === 0) {
+    const li = document.createElement('li');
+    li.textContent = 'No hay partidas registradas en esta sesión.';
+    li.style.justifyContent = 'center';
+    li.style.color = 'var(--texto-tenue)';
+    contenedor.appendChild(li);
+    return;
+  }
+
+  // Renderizar el arreglo en orden inverso (las más recientes primero)
+  const historialInvertido = [...state.historialPartidas].reverse();
+  
+  historialInvertido.forEach(partida => {
+    const li = document.createElement('li');
+    
+    // Construcción del texto: "Partida 1 | 12 pares | 24 movs | 0:45s"
+    li.textContent = `Partida ${partida.numero}: ${partida.pares} pares — ${partida.movimientos} movs. en ${partida.tiempo}`;
+    
+    contenedor.appendChild(li);
+  });
+}
 
 // FIX Seguridad: Prevención XSS. 
 // Uso exclusivo de createElement y textContent. NO se usa innerHTML.
 function mostrarVictoria() {
   const ms = state.tiempoFin - state.tiempoInicio;
-  const tiempo = formatearTiempo(ms);
+  const tiempoPartida = formatearTiempo(ms);
+
+  // Acumulamos los logros de esta sesión ANTES de mostrar el modal
+  state.partidasJugadas++;
+  state.tiempoTotalAcumulado += ms;
+  const tiempoTotal = formatearTiempo(state.tiempoTotalAcumulado);
+  state.historialPartidas.push({
+    numero: state.partidasJugadas,
+    pares: state.totalPares,
+    movimientos: state.movimientos,
+    tiempo: tiempoPartida
+  });
+
+  // Actualizar el historial visualmente por detrás del modal
+  renderizarHistorial();
 
   elOverlay.classList.add('visible');
   elMensaje.textContent = ''; // Limpiar seguro
@@ -198,22 +247,31 @@ function mostrarVictoria() {
   titulo.className = 'titulo-victoria';
   titulo.textContent = `¡Felicidades, ${state.nombreJugador}! 🏆`; 
 
-  const detalle = document.createElement('p');
-  detalle.className = 'detalle-victoria';
-  detalle.textContent = `Encontraste los ${state.totalPares} pares en ${state.movimientos} movimientos y ${tiempo} segundos.`;
+  const detallePartida = document.createElement('p');
+  detallePartida.className = 'detalle-victoria';
+  detallePartida.textContent = `⏱️ Esta partida: ${state.movimientos} movimientos en ${tiempoPartida}s.`;
 
-  const btnCerrar = document.createElement('button');
+  // Nueva sección visual de logros acumulados
+  const detalleAcumulado = document.createElement('p');
+  detalleAcumulado.style.marginTop = '10px';
+  detalleAcumulado.style.fontSize = '0.95rem';
+  detalleAcumulado.style.color = '#747d8c';
+  detalleAcumulado.textContent = `🔥 Racha actual: ${state.partidasJugadas} partidas ganadas (Tiempo total: ${tiempoTotal}s)`;
+
+const btnCerrar = document.createElement('button');
   btnCerrar.textContent = 'Jugar de nuevo';
   btnCerrar.style.marginTop = '24px';
   btnCerrar.style.width = '100%';
   btnCerrar.style.justifyContent = 'center';
   btnCerrar.addEventListener('click', () => {
     elOverlay.classList.remove('visible');
-    iniciarJuego();
+    // Reinicio suave: mantiene la racha de victorias
+    iniciarJuego(false); 
   });
 
   elMensaje.appendChild(titulo);
-  elMensaje.appendChild(detalle);
+  elMensaje.appendChild(detallePartida);
+  elMensaje.appendChild(detalleAcumulado);
   elMensaje.appendChild(btnCerrar);
 }
 
@@ -260,16 +318,22 @@ elTablero.addEventListener('click', e => {
   voltearCarta(Number(divCarta.dataset.indice));
 });
 
-document.getElementById('btn-reiniciar').addEventListener('click', iniciarJuego);
-document.getElementById('dificultad').addEventListener('change', iniciarJuego);
+// FIX: Reinicio fuerte (Borra el historial)
+document.getElementById('btn-reiniciar').addEventListener('click', () => iniciarJuego(true));
+
+// FIX: Cambiar la dificultad también borra el historial para ser justos con los tiempos
+document.getElementById('dificultad').addEventListener('change', () => iniciarJuego(true));
+
+// FIX: Presionar la tecla 'R' hace reinicio fuerte
 document.addEventListener('keydown', e => {
-  if (e.key.toLowerCase() === 'r' && document.activeElement.tagName !== 'INPUT') iniciarJuego();
+  if (e.key.toLowerCase() === 'r' && document.activeElement.tagName !== 'INPUT') {
+    iniciarJuego(true);
+  }
 });
 
-// FIX: Actualización en tiempo real del nombre del jugador.
-// Evita el bug donde el usuario escribe su nombre a mitad de la partida.
 document.getElementById('nombre').addEventListener('input', (e) => {
   state.nombreJugador = e.target.value.trim() || 'Jugador';
 });
 
-iniciarJuego(); 
+// Arranque inicial suave
+iniciarJuego(false);

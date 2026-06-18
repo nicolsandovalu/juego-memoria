@@ -133,6 +133,51 @@ button:active { transform: scale(0.95); }
 .overlay-victoria.visible .mensaje-victoria {
   animation: reboteCelebracion 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
+/* =============================================
+   HISTORIAL DE SESIÓN
+   ============================================= */
+.historial-zona {
+  background: var(--superficie);
+  border: 2px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+}
+
+.historial-zona h3 {
+  font-size: 1rem;
+  color: var(--acento);
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+#lista-historial {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 140px; /* Permite scroll si hay muchas partidas */
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+#lista-historial li {
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 10px 12px;
+  background: var(--fondo);
+  border-radius: 8px;
+  color: var(--texto);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Scrollbar personalizado para el historial */
+#lista-historial::-webkit-scrollbar { width: 6px; }
+#lista-historial::-webkit-scrollbar-track { background: var(--fondo); border-radius: 8px; }
+#lista-historial::-webkit-scrollbar-thumb { background: var(--borde); border-radius: 8px; }
 
 @keyframes reboteCelebracion {
   0% { transform: scale(0.5); opacity: 0; }
