@@ -152,7 +152,7 @@ const elMensaje = document.getElementById('mensaje-victoria');
 const elRecord = document.getElementById('display-record');
 
 function construirTableroDOM() {
-  elTablero.innerHTML = ''; 
+  elTablero.textContent = ''; 
 
   // FIX UX: Cálculo dinámico para evitar el scroll vertical.
   // Mantenemos la cuadrícula en un máximo de 4 filas siempre.
