@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Juego de Memoria — versión corregida (Parte 2)</title>
+<title>Juego de Memoria — versión auditada</title>
 <style>
   body{font-family:system-ui,sans-serif;max-width:540px;margin:40px auto;padding:0 16px;color:#222}
   h1{font-size:1.4rem}
@@ -20,204 +20,128 @@
 </style>
 </head>
 <body>
-<h1>Juego de Memoria — Parte 2 Corregida</h1>
+<h1>Juego de Memoria</h1>
 
-<div class="fila">
+<header class="fila" aria-label="Controles del juego">
   <input id="nombre" placeholder="Tu nombre...">
   <button id="iniciar">Iniciar / Reiniciar</button>
-</div>
+</header> <!--Arquitectura — Sin semántica HTML (Divitis):
+       El código original estructuraba toda la vista con etiquetas <div>.
+       Esto rompe los estándares de accesibilidad (a11y). Se reemplazaron 
+       por etiquetas semánticas como <header> para los controles y <main> 
+       para el tablero de juego.-->
+
+<main id="tablero" aria-label="Tablero de cartas"></main>
 
 <div id="tablero"></div>
 <p id="movimientos"></p>
 <p id="mensaje"></p>
 
-<!--
-  ============================================================
-  AUDITORÍA COMPLETA — Bugs encontrados y corregidos
-  Categorías: funcional (F), seguridad (S), arquitectura (A)
-  ============================================================
-
-  RESUMEN DE PROBLEMAS ENCONTRADOS:
-
-  [F1] Bug funcional — Sin bloqueo de tablero:
-       No existe ninguna variable de bloqueo. Se pueden voltear
-       3 o más cartas en un turno, y hacer doble click sobre la
-       misma carta la hace par consigo misma.
-
-  [F2] Bug funcional — Comparación leyendo el DOM en vez del estado:
-       `divs[a].textContent === divs[b].textContent` compara
-       lo que está pintado en pantalla, no el estado real.
-       Si a === b (doble click), ambos muestran el mismo emoji
-       y la condición es true: la carta hace pareja consigo misma.
-
-  [F3] Bug funcional — No se verifica si la carta ya está encontrada:
-       voltearCarta() no comprueba cartas[i].encontrada, así que
-       se puede re-voltear una carta ya encontrada y romper el estado.
-
-  [S1] Seguridad — XSS con innerHTML:
-       `mensaje.innerHTML = '¡Ganaste, ' + nombre + '! 🎉'`
-       Si el usuario escribe `<img src=x onerror=alert(1)>` en el
-       input, ese HTML se ejecuta. Se debe usar textContent o
-       createElement/appendChild.
-
-  [A1] Arquitectura — Un listener por carta recreado en cada render:
-       Dentro de render() se llama a div.addEventListener('click',...)
-       por cada carta creada. Al reiniciar, tablero.innerHTML = ''
-       destruye los nodos, pero si hubiera referencias externas los
-       listeners quedarían acumulados (memory leak). La solución
-       correcta es un único listener por delegación en el contenedor.
-
-  [A2] Arquitectura — La UI se modifica directamente en voltearCarta():
-       La función mezcla lógica de estado (push, comparar) con
-       mutación del DOM (div.textContent, classList.add). La UI
-       debería derivarse siempre del estado a través de render().
-
-  [A3] Arquitectura — El "bloqueo" no está en el estado:
-       No hay state.bloqueado. El bloqueo debería ser una propiedad
-       del objeto de estado para que sea la fuente de verdad.
-  ============================================================
--->
-
 <script>
-  const EMOJIS = ['🍎', '🚀', '🐱', '🌵', '🎲', '🎧', '⚽', '🍕'];
+  const EMOJIS = ['🍎', '🚀', '🐱', '🌵', '🎲', '🎧', '⚽', '🍕']; 
 
-  // FIX [A3]: el bloqueo es parte del estado, no una variable suelta
-  // Se utiliza 'let' porque estas variables necesitan ser reasignadas
-
-  //Almacena los índices numéricos de las cartas evaluadas en el turno activo. Se vacía y reconstruye completamente en cada reinicio.
-  let cartas = [];
-  // Almacena los índices numéricos de las cartas evaluadas en el turno activo.
-  // Se limpia (reasigna a []) tras verificar si las cartas coinciden o no.
-  let volteadas = [];
-  // Rastrea la cantidad de intentos. Se incrementa en 1 cada vez que se voltean 2 cartas.
-  let movimientos = 0;
-  // Almacena el string proveniente del input del usuario para mostrarlo en la victoria.
-  let nombre = '';
-  // Protege el flujo congelando la interacción mientras el setTimeout está activo.
-  let bloqueado = false;  // FIX [F1][A3]: variable de bloqueo explícita
+  // FIX Arquitectura: Agrupamos las variables sueltas en una única fuente de verdad.
+  // BUG Arquitectura: Usar múltiples 'let' sueltos fragmenta el estado y dificulta el rastreo de bugs.
+  const state = {
+    cartas: [],
+    volteadas: [],
+    movimientos: 0,
+    nombre: '',
+    bloqueado: false // FIX Funcional: Añadimos una bandera para bloquear el tablero
+  };
 
   const tablero = document.getElementById('tablero');
 
   document.getElementById('iniciar').addEventListener('click', function () {
-    nombre = document.getElementById('nombre').value;
-    cartas = [];
+    state.nombre = document.getElementById('nombre').value;
+    state.cartas = [];
     EMOJIS.forEach(function (e) {
-      cartas.push({ emoji: e, encontrada: false });
-      cartas.push({ emoji: e, encontrada: false });
+      state.cartas.push({ emoji: e, encontrada: false });
+      state.cartas.push({ emoji: e, encontrada: false });
     });
-    // Nota: Array.sort con Math.random()-0.5 produce distribuciones sesgadas.
-    // Fisher-Yates sería más correcto, pero se mantiene para mínimos cambios.
-    cartas.sort(function () { return Math.random() - 0.5; });
-    volteadas = [];
-    movimientos = 0;
-    bloqueado = false;    // FIX [F1]: resetear bloqueo al reiniciar
+    state.cartas.sort(function () { return Math.random() - 0.5; });
+    state.volteadas = [];
+    state.movimientos = 0;
+    state.bloqueado = false; // Reiniciamos el bloqueo
     document.getElementById('mensaje').textContent = '';
     render();
   });
 
-  // FIX [A1]: un solo listener por delegación, fuera de render()
-  // BUG [A1]: antes había un addEventListener dentro del bucle de render(),
-  //           creando N listeners (uno por carta) en cada render.
-  tablero.addEventListener('click', function (e) {
+  // FIX Arquitectura/Rendimiento: Delegación de eventos en el contenedor padre.
+  // BUG Arquitectura/Rendimiento: Antes se creaba un eventListener por cada carta dentro del bucle for en render(). Al reiniciar, los listeners antiguos quedaban en memoria (Memory Leak).
+  tablero.addEventListener('click', function(e) {
     const div = e.target.closest('.carta');
     if (div) voltearCarta(div);
   });
 
   function render() {
-    tablero.innerHTML = '';
-    for (let i = 0; i < cartas.length; i++) {
+    // FIX Arquitectura y Seguridad: Limpieza del DOM segura y optimizada.
+    // BUG Arquitectura: Usar `innerHTML = ''` para vaciar un nodo es ineficiente 
+    // porque obliga al navegador a invocar su parser de HTML. Además, mantiene 
+    // en el código una propiedad inherentemente vulnerable a XSS.
+    
+    tablero.textContent = '';
+    for (let i = 0; i < state.cartas.length; i++) {
       const div = document.createElement('div');
       div.className = 'carta';
       div.dataset.indice = i;
-
-      // Se reconstruye la clase visual desde el estado
-      if (cartas[i].encontrada) div.classList.add('encontrada');
-      if (volteadas.includes(i)) div.classList.add('volteada');
-
-      // textContent es seguro; no hay datos de usuario en el emoji
-      div.textContent = cartas[i].encontrada || volteadas.includes(i)
-        ? cartas[i].emoji
-        : '?';
-
-      // BUG [A1] ORIGINAL: div.addEventListener('click', ...) ← eliminado
+      
+      // La UI se deriva del estado
+      if (state.cartas[i].encontrada) div.classList.add('encontrada');
+      if (state.volteadas.includes(i)) div.classList.add('volteada');
+      
+      div.textContent = state.cartas[i].encontrada || state.volteadas.includes(i) ? state.cartas[i].emoji : '?';
+      
+      // BUG ELIMINADO: div.addEventListener('click', ...) ya no está aquí.
       tablero.appendChild(div);
     }
-    document.getElementById('movimientos').textContent = 'Movimientos: ' + movimientos;
+    document.getElementById('movimientos').textContent = 'Movimientos: ' + state.movimientos;
   }
 
   function voltearCarta(div) {
-    // FIX [F1]: guardia de bloqueo — impide voltear mientras se resuelve el par
-    // BUG [F1]: no existía ningún bloqueo; se podían voltear 3+ cartas por turno
-    if (bloqueado) return;
-
+    // FIX Funcional: Implementación de guardias (Guard Clauses)
+    // BUG Funcional: Faltaba bloquear turnos. Permitía voltear 3 cartas rápido o hacer doble clic en la misma carta para que hiciera pareja consigo misma.
+    if (state.bloqueado) return; 
+    
     const i = Number(div.dataset.indice);
+    
+    if (state.cartas[i].encontrada) return; // Ignora cartas ya resueltas
+    if (state.volteadas.includes(i)) return; // Ignora la carta si ya está volteada (evita auto-pareja)
 
-    // FIX [F3]: ignorar cartas ya encontradas
-    // BUG [F3]: no se verificaba cartas[i].encontrada
-    if (cartas[i].encontrada) return;
+    state.volteadas.push(i);
+    render(); // FIX Arquitectura: Mutamos el estado y llamamos a render(), no mutamos el DOM directamente.
 
-    // FIX [F1]: ignorar carta ya volteada en este turno (previene doble click)
-    // BUG [F1+F2]: sin esta guarda, el doble click empujaba el mismo índice
-    //              dos veces, y la comparación i===i con el mismo emoji daba true.
-    if (volteadas.includes(i)) return;
+    if (state.volteadas.length === 2) {
+      state.movimientos++;
+      const a = state.volteadas[0];
+      const b = state.volteadas[1];
 
-    // Mostrar el emoji directamente (sin modificar el estado cartas[])
-    div.textContent = cartas[i].emoji;
-    div.classList.add('volteada');
-    volteadas.push(i);
-
-    if (volteadas.length === 2) {
-      movimientos++;
-      document.getElementById('movimientos').textContent = 'Movimientos: ' + movimientos;
-
-      const a = volteadas[0];
-      const b = volteadas[1];
-
-      // FIX [F2]: comparar desde el estado (cartas[].emoji), no desde el DOM.
-      // BUG [F2]: `divs[a].textContent === divs[b].textContent` leía el DOM.
-      //           Si a === b (doble click) ambos muestran el mismo emoji → par falso.
-      if (cartas[a].emoji === cartas[b].emoji) {
-        cartas[a].encontrada = true;
-        cartas[b].encontrada = true;
-        volteadas = [];
-        // bloqueado sigue false: par encontrado, no hay retardo
+      // FIX Arquitectura: Comparación basada en el estado (memoria de JS).
+      // BUG Arquitectura: `if (divs[a].textContent === divs[b].textContent)` leía directamente del DOM. El DOM es una vista, no una base de datos.
+      if (state.cartas[a].emoji === state.cartas[b].emoji) {
+        state.cartas[a].encontrada = true;
+        state.cartas[b].encontrada = true;
+        state.volteadas = [];
         render();
         revisarVictoria();
       } else {
-        // FIX [F1]: bloquear el tablero durante el timeout
-        bloqueado = true;
-        const divs = tablero.querySelectorAll('.carta');
+        state.bloqueado = true; // Bloqueamos el tablero antes del retardo
         setTimeout(function () {
-          divs[a].textContent = '?';
-          divs[b].textContent = '?';
-          divs[a].classList.remove('volteada');
-          divs[b].classList.remove('volteada');
-          volteadas = [];
-          bloqueado = false;  // FIX [F1]: desbloquear al terminar
+          state.volteadas = [];
+          state.bloqueado = false; // Desbloqueamos tras ocultar
+          render();
         }, 800);
       }
     }
   }
 
   function revisarVictoria() {
-    const todasEncontradas = cartas.every(function (c) { return c.encontrada; });
+    const todasEncontradas = state.cartas.every(function (c) { return c.encontrada; });
     if (todasEncontradas) {
-      const el = document.getElementById('mensaje');
-
-      // FIX [S1]: construir el mensaje con textContent + createElement, nunca innerHTML
-      // BUG [S1]: `innerHTML = '¡Ganaste, ' + nombre + '! 🎉'` es vulnerable a XSS.
-      //           Un nombre como <img src=x onerror=alert(document.cookie)> se ejecuta.
-
-      el.textContent = '';                        // limpiar sin innerHTML
-
-      const textoBase = document.createTextNode('¡Ganaste, ');
-      const spanNombre = document.createElement('span');
-      spanNombre.textContent = nombre;           // escapa HTML automáticamente
-      const textoFin = document.createTextNode('! 🎉');
-
-      el.appendChild(textoBase);
-      el.appendChild(spanNombre);
-      el.appendChild(textoFin);
+      // FIX Seguridad: Uso de textContent para prevenir inyección de código.
+      // BUG Seguridad: `innerHTML = '¡Ganaste, ' + nombre` ejecutaba cualquier script malicioso ingresado en el input (ej. <img src=x onerror=alert('hack')>).
+      const mensaje = document.getElementById('mensaje');
+      mensaje.textContent = '¡Ganaste, ' + state.nombre + '! 🎉';
     }
   }
 </script>
