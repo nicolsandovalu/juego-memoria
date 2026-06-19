@@ -1,6 +1,6 @@
 # Proyecto: Juego de memoria 
 
-🎮 **¡Si quieres jugar, visita la web!** [Jugar Memoria aquí](https://nicolsandovalu.github.io/juego-memoria/)
+**¡Si quieres jugar, visita la web!** [Jugar Memoria aquí](https://nicolsandovalu.github.io/juego-memoria/)
 
 Este repositorio contiene la entrega del proyecto de Programación Front End. Es un juego interactivo desarrollado con JavaScript Vanilla, HTML semántico y CSS, enfocado en el manejo riguroso del DOM y eventos asíncronos.
 
